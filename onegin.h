@@ -22,6 +22,9 @@
 
 static const size_t POINTER_POISON = 13;
 
+static const size_t MAX_FILENAME_SIZE = 64;
+
+
 struct String {
     char*  beg = (char*)POINTER_POISON;
     size_t len = -1;

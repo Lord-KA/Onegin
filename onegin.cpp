@@ -1,20 +1,6 @@
 #include "onegin.h"
 
 
-static const size_t MAX_FILENAME_SIZE = 64;
-
-static void printIndex(String* Index, size_t indexSize)
-{
-    for (size_t i = 0; i < indexSize; ++i) {
-        char* iter = Index[i].beg;
-        while(*iter != '\n') {
-            printf("%c", *iter);
-            ++iter;
-        }
-        printf("\n size = %zu\n", Index[i].len);
-    }
-}
-
 int main(int argc, char *argv[]) 
 {
     char fileName[MAX_FILENAME_SIZE + 1];
@@ -52,10 +38,10 @@ int main(int argc, char *argv[])
     Text text;
     Text_ctor(&text, fileName);
 
-    printf("Here!\n");
     Text_dumpIndex(&text);
 
 
+    printf("Here!\n");
     qsort(text.Index, text.indexLen, sizeof(char*), straightComp);
     
     Text_dumpIndex(&text);
