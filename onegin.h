@@ -20,15 +20,15 @@
 #include "gqsort.h"
 
 struct String {
-    wchar_t* beg;
+    char* beg;
     size_t len;
 } typedef String;
 
 
 int straightComp(const void *first, const void *second)         //TODO
 {
-    wchar_t* firstBeg  = ((String*)first )->beg;
-    wchar_t* secondBeg = ((String*)second)->beg;
+    char* firstBeg  = ((String*)first )->beg;
+    char* secondBeg = ((String*)second)->beg;
     
     size_t firstIter  = 0;
     size_t secondIter = 0;
@@ -43,11 +43,11 @@ int straightComp(const void *first, const void *second)         //TODO
             ++secondIter;
         else { 
             if (*(secondBeg + secondIter) < *(firstBeg + firstIter)) {
-                printf("First diff: %c < %c\n", *(secondBeg + secondIter), *(firstBeg + firstIter));
+                // printf("First diff: %c < %c\n", *(secondBeg + secondIter), *(firstBeg + firstIter));
                 return 1;
             }
             if (*(secondBeg + secondIter) > *(firstBeg + firstIter)) { 
-                printf("First diff: %c < %c\n", *(secondBeg + secondIter), *(firstBeg + firstIter));
+                // printf("First diff: %c < %c\n", *(secondBeg + secondIter), *(firstBeg + firstIter));
                 return -1;
             }
             ++firstIter;
@@ -55,9 +55,9 @@ int straightComp(const void *first, const void *second)         //TODO
         }
     }
 
-    if (firstIter == firstLen && secondIter < secondLen)
+    if (firstLen < secondLen)
         return -1;
-    else if (secondIter == secondLen && firstIter < firstLen)
+    else if (firstLen > secondLen)
         return 1;
 
     return 0;

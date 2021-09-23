@@ -6,12 +6,12 @@ static const size_t MAX_FILENAME_SIZE = 64;
 static void printIndex(String* Index, size_t indexSize)
 {
     for (size_t i = 0; i < indexSize; ++i) {
-        wchar_t* iter = Index[i].beg;
+        char* iter = Index[i].beg;
         while(*iter != '\n') {
-            wprintf(L"%lc", *iter);
+            printf("%c", *iter);
             ++iter;
         }
-        printf("\n size = %d\n", Index[i].len);
+        printf("\n size = %zu\n", Index[i].len);
     }
 }
 
@@ -58,13 +58,14 @@ int main(int argc, char *argv[])
 
     fseek(inp, 0, SEEK_END);
     size_t bufLen = ftell(inp);
-    wchar_t *buffer = (wchar_t*)calloc(bufLen, sizeof(wchar_t));         //TODO free buffer properly
+    char *buffer = (char*)calloc(bufLen + 1, sizeof(char));         //TODO free buffer properly
     fseek(inp, 0, 0);
-    fread(buffer, sizeof(wchar_t), bufLen + 1, inp);
+    fread(buffer, sizeof(char), bufLen, inp);
     buffer[bufLen] = 0;
 
-    printf("%zu\n", wcslen(buffer));
-    wprintf(L" %ls \n==========\n", buffer);
+    // printf("%zu\n", wcslen(buffer));
+    // printf(" %s \n==========\n", buffer);
+    // wprintf(L"%ls \n", L"A wide string");
 
     size_t indexSize = 0;
     for (size_t i = 0; i < bufLen; ++i) {
@@ -72,9 +73,10 @@ int main(int argc, char *argv[])
             ++indexSize;
         }
     }
-
+    printf("indexSize = %zu\n", indexSize);
     if (indexSize == 0) {   //TODO 
         printf("File is empty?\n");
+        free(buffer);
         return 0;
     }
 
@@ -83,18 +85,21 @@ int main(int argc, char *argv[])
     Index[0].beg = buffer;
     size_t indexCnt = 0;
 
-    for (size_t i = 0; i < bufLen; ++i) {
+    for (size_t i = 0; i < bufLen && indexCnt < indexSize - 1; ++i) {
         if (buffer[i] == '\n') {
-            Index[indexCnt].len = dist(Index[indexCnt].beg, &buffer[i]) / sizeof(wchar_t);
+            printf("indexCnt = %zu\n", indexCnt);
+            Index[indexCnt].len = dist(Index[indexCnt].beg, &buffer[i]);// / sizeof(char); //TODO find why is this constant 
             ++indexCnt;
             Index[indexCnt].beg = &buffer[i + 1];
         }
     }
+    Index[indexCnt].len = dist(Index[indexCnt].beg, buffer + bufLen - 1);
 
+    printf("Here!\n");
     printIndex(Index, indexSize);
 
 
-    qsort(Index, indexSize, sizeof(wchar_t*), straightComp);
+    qsort(Index, indexSize, sizeof(char*), straightComp);
     
     printIndex(Index, indexSize);
 
