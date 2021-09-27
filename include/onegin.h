@@ -242,8 +242,9 @@ static void Text_dtor(Text *this_)
     free(this_->dataWrapper);
     free(this_->Index);
 
-    this_->data = (char*)POINTER_POISON;
-    this_->Index = (String*)POINTER_POISON;
+    this_->data        = (char*)POINTER_POISON;
+    this_->dataWrapper = (char*)POINTER_POISON;
+    this_->Index     = (String*)POINTER_POISON;
 }
 
 /**
@@ -261,6 +262,7 @@ static void Text_dtor(Text *this_)
  *  @param firstIter pointer (iterator) to one c-style string 
  *  @param secondIter pointer (iterator) to other c-style string 
  *  @param direction equals 1 or -1 dependent on the intended direction of iterators
+ *  @return -1 if first < second; 1 if first > second; 0 if first == second
  */
 int continuoslyCompare(char* firstIter, char* secondIter, int direction) 
 {
@@ -319,6 +321,7 @@ int continuoslyCompare(char* firstIter, char* secondIter, int direction)
  *  @brief generalized func for comparing c-style strings bound by '\n'
  *  @param first_inp pointer to the first String struct
  *  @param first_inp pointer to the second String struct
+ *  @return -1 if first < second; 1 if first > second; 0 if first == second
  */
 static int straightComp(const void *first_inp, const void *second_inp)         
 {
@@ -339,6 +342,7 @@ static int straightComp(const void *first_inp, const void *second_inp)
  *  @brief generalized func for comparing c-style strings bound by '\n' starting from the end
  *  @param first_inp pointer to the first String struct
  *  @param first_inp pointer to the second String struct
+ *  @return -1 if first < second; 1 if first > second; 0 if first == second
  */
 static int reverseComp(const void *first_inp, const void *second_inp)         
 {
