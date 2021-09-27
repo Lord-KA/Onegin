@@ -38,8 +38,10 @@ int main(int argc, char *argv[])
     gqsort(text.Index, text.indexLen, sizeof(String), straightComp);
     Text_printIndex(&text);
 
-    qsort(text.Index, text.indexLen, sizeof(String), reverceComp);
+    qsort(text.Index, text.indexLen, sizeof(String), reverseComp);
     Text_printIndex(&text);
+
+    Text_printBuf(&text);
 
     Text_dtor(&text);
 }

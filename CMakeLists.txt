@@ -42,11 +42,14 @@ add_executable(test-gqsort src/test-gqsort.cpp)
 add_executable(test-comp src/test-comp.cpp)
 
 target_link_libraries(
-    test-gqsort
     test-comp
     gtest_main
 )
 
+target_link_libraries(
+    test-gqsort
+    gtest_main
+)
 include(GoogleTest)
 gtest_discover_tests(test-gqsort)
 gtest_discover_tests(test-comp)

@@ -1,4 +1,9 @@
 #include "gqsort.h"
+#include <random>
+
+#include "gtest/gtest.h"
+
+std::mt19937 rnd(NULL);
 
 int compInt(const void *one, const void *other)    
 {
@@ -12,52 +17,46 @@ int compInt(const void *one, const void *other)
 }
 
 
-int compChar(const void *one, const void *other) 
-{
-    char* a = (char*)one;
-    char* b = (char*)other;
-}
-
-void testInt()
+TEST(GQSort, manual)
 {
     int A[] = {9, 8, 7, 6, 4, 5, 0, 11};
+    int B[] = {9, 8, 7, 6, 4, 5, 0, 11};
+    
     size_t size = 8;
-
-    for (size_t i = 0; i < size; ++i) {
-        printf("%d ", A[i]);
-    }
-    printf("\n");
 
 
     gqsort(A, size, sizeof(int), compInt);
-
-
-    for (size_t i = 0; i < size; ++i) {
-        printf("%d ", A[i]);
-    }
-    printf("\n");
+    gqsort(B, size, sizeof(int), compInt);
     
+    for (size_t i = 0; i < size; ++i) {
+        EXPECT_EQ(A[i], B[i]);
+    }
 }
 
-void testChar()
+TEST(GQSort, random)
 {
-    char** A;
-    A = (char**)calloc(8, sizeof(char*));
-    A[0] = "aaa";
-    A[1] = "bbb";
-    A[2] = "ccc";
-    A[3] = "cab";
-    A[4] = "cba";
-    A[5] = "abc";
-    A[6] = "aac";
-    A[7] = "caa";
+    for (size_t j = 0; j < 100; ++j) {
 
-    free(A);
-}
+        size_t size = rnd() % 10000 + 100;
+
+        int *A = (int*)calloc(size, sizeof(int));
+        int *B = (int*)calloc(size, sizeof(int));
+
+        for (size_t i = 0; i < size; ++i) {
+            A[i] = rnd();
+            B[i] = A[i];
+        }
+
+        gqsort(A, size, sizeof(int), compInt);
+        qsort(B, size, sizeof(int), compInt);
 
 
-int main()
-{
-    testInt();
-    testChar();
+        for (size_t i = 0; i < size; ++i) {
+            EXPECT_EQ(A[i], B[i]);
+        }
+
+        free(A);
+        free(B);
+    }
+
 }

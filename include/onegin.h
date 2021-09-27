@@ -35,11 +35,12 @@ struct String {
 //  Text struct
 
 struct Text {
-    char  *data = (char*)POINTER_POISON;
-    size_t dataLen = -1;
+    char  *dataWrapper = (char*)POINTER_POISON;
+    char  *data        = (char*)POINTER_POISON;
+    size_t dataLen     = -1;
 
-    String *Index = (String*)POINTER_POISON;
-    size_t indexLen = -1;
+    String *Index    = (String*)POINTER_POISON;
+    size_t  indexLen = -1;
 } typedef Text;
 
 
@@ -61,13 +62,18 @@ static void Text_ctor(Text *this_, char* fileName) {
     }
     #endif
 
-    this_->data = (char*)calloc(this_->dataLen + 1, sizeof(char));         //TODO free buffer properly
+    // this_->data = (char*)calloc(this_->dataLen + 1, sizeof(char));         
+    this_->dataWrapper = (char*)calloc(this_->dataLen + 2, sizeof(char));         
     
-    if (!this_->data) { //TODO check what calloc returns on failure
+    if (!this_->dataWrapper) { 
         printf("Failed to allocate buffer memory.\n");
         assert(false);
     }
-    
+
+    this_->dataWrapper[0]                  = '\n';
+    this_->dataWrapper[this_->dataLen + 1] = '\n';
+
+    this_->data = this_->dataWrapper + 1;
    
     fseek(inp, 0, 0);
     fread(this_->data, sizeof(char), this_->dataLen, inp);
@@ -80,11 +86,11 @@ static void Text_ctor(Text *this_, char* fileName) {
         }
     }
 
-    if (this_->indexLen == 0) {   //TODO 
+    if (this_->indexLen == 0) {   
         printf("File is empty?\n");
         free(this_->data);
         this_->data = (char*)POINTER_POISON;
-        assert(false);
+        exit(0);
     }
 
     
@@ -150,6 +156,16 @@ static void Text_printIndex(Text *this_)         //TODO add cout/cerr pipes supp
     }
 }
 
+static void Text_printBuf(Text *this_)
+{
+    char tmp = this_->data[this_->dataLen];
+    this_->data[this_->dataLen] = '\0';
+
+    printf("%s", this_->data);
+
+    this_->data[this_->dataLen] = tmp;
+}
+
 static void Text_dtor(Text *this_)
 {
     #ifndef NDEBUG
@@ -166,8 +182,63 @@ static void Text_dtor(Text *this_)
     this_->Index = (String*)POINTER_POISON;
 }
 
+
 //==================================
 // Compair functions
+
+
+int continuoslyCompare(char* firstIter, char* secondIter, int direction) 
+{
+    assert(direction == 1 || direction == -1);
+
+    while (*firstIter != '\n' && *secondIter != '\n') {
+        if (!isalpha(*(firstIter))) 
+            firstIter += direction;
+        else if (!isalpha(*(secondIter)))
+            secondIter += direction;
+        else { 
+            if (*(secondIter) < *(firstIter)) {
+                #ifdef  VERBOSE_COMP
+                printf("First diff chars: %c < %c\n", *secondIter, *firstIter);
+                #endif
+                return 1;
+            }
+            if (*(secondIter) > *(firstIter)) { 
+                #ifdef  VERBOSE_COMP
+                printf("First diff chars: %c > %c\n", *secondIter, *firstIter);
+                #endif
+                return -1;
+            }
+            firstIter += direction;
+            secondIter += direction;
+        }
+    }
+    while (!isalpha(*firstIter) && *firstIter != '\n')
+        firstIter += direction;
+
+    while (!isalpha(*secondIter) && *secondIter != '\n')
+        secondIter += direction;
+
+    if (*firstIter < *secondIter) {
+        #ifdef  VERBOSE_COMP
+        printf("Same letters diff lens: %zu < %zu\n", first->len, second->len);
+        #endif
+        return -1;
+    }
+    else if (*firstIter > *secondIter) {
+        #ifdef  VERBOSE_COMP
+        printf("Same letters diff lens: %zu %zu\n", first->len, second->len);
+        #endif
+        return 1;
+    }
+    
+    #ifdef  VERBOSE_COMP
+    printf("Equal strings\n");
+    #endif
+
+    return 0;
+}
+
 
 static int straightComp(const void *first_inp, const void *second_inp)         
 {
@@ -179,8 +250,9 @@ static int straightComp(const void *first_inp, const void *second_inp)
     
     assert(firstIter  != (char*)POINTER_POISON);
     assert(secondIter != (char*)POINTER_POISON);
-
     
+    return continuoslyCompare(firstIter, secondIter, 1);
+    /*
     while (*firstIter != '\n' && *secondIter != '\n') {
         if (!isalpha(*(firstIter))) 
             ++firstIter;
@@ -188,35 +260,62 @@ static int straightComp(const void *first_inp, const void *second_inp)
             ++secondIter;
         else { 
             if (*(secondIter) < *(firstIter)) {
+                #ifdef  VERBOSE_COMP
+                printf("First diff chars: %c < %c\n", *secondIter, *firstIter);
+                #endif
                 return 1;
             }
             if (*(secondIter) > *(firstIter)) { 
+                #ifdef  VERBOSE_COMP
+                printf("First diff chars: %c > %c\n", *secondIter, *firstIter);
+                #endif
                 return -1;
             }
             ++firstIter;
             ++secondIter;
         }
     }
+    while (!isalpha(*firstIter) && *firstIter != '\n')
+        ++firstIter;
 
-    if (first->len < second->len)
+    while (!isalpha(*secondIter) && *secondIter != '\n')
+        ++secondIter;
+
+    if (*firstIter < *secondIter) {
+        #ifdef  VERBOSE_COMP
+        printf("Same letters diff lens: %zu < %zu\n", first->len, second->len);
+        #endif
         return -1;
-    else if (first->len > second->len)
+    }
+    else if (*firstIter > *secondIter) {
+        #ifdef  VERBOSE_COMP
+        printf("Same letters diff lens: %zu %zu\n", first->len, second->len);
+        #endif
         return 1;
+    }
+    
+    #ifdef  VERBOSE_COMP
+    printf("Equal strings\n");
+    #endif
 
     return 0;
+    */
 }
 
-static int reverceComp(const void *first_inp, const void *second_inp)         
+static int reverseComp(const void *first_inp, const void *second_inp)         
 {
     String* first = (String*)first_inp;
     String* second = (String*)second_inp;
 
+    assert(first->beg  != (char*)POINTER_POISON);
+    assert(second->beg != (char*)POINTER_POISON);
+
     char* firstIter  = first->beg + first->len - 1;
     char* secondIter = second->beg + second->len - 1;
     
-    assert(firstIter  != (char*)POINTER_POISON);
-    assert(secondIter != (char*)POINTER_POISON);
 
+    return continuoslyCompare(firstIter, secondIter, -1);
+    /*
     while (*firstIter != '\n' && *secondIter != '\n') {   
         if (!isalpha(*(firstIter))) 
             --firstIter;
@@ -243,6 +342,9 @@ static int reverceComp(const void *first_inp, const void *second_inp)
         return 1;
 
     return 0;
+    */
 }
+
+
 
 #endif
