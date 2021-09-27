@@ -8,14 +8,8 @@ int main(int argc, char *argv[])
     int option = 0; 
     while ((option = getopt(argc, argv, "f:lrxh")) != -1) {             //TODO 
         switch(option) {
-            case 'i':           //TODO
-            case 'l':
-            case 'r':
-                printf("Options %c\n", option);
-                break;
-
             case 'h':
-                printf("This is (a very usefull) help message!\n");
+                printf("sort [-h; -f fileName]\n");
                 break;
 
             case 'f':
@@ -41,8 +35,11 @@ int main(int argc, char *argv[])
     Text_dumpIndex(&text);
 
 
-    printf("Here!\n");
-    qsort(text.Index, text.indexLen, sizeof(char*), straightComp);
-    
-    Text_dumpIndex(&text);
+    gqsort(text.Index, text.indexLen, sizeof(String), straightComp);
+    Text_printIndex(&text);
+
+    qsort(text.Index, text.indexLen, sizeof(String), reverceComp);
+    Text_printIndex(&text);
+
+    Text_dtor(&text);
 }

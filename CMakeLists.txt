@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDART 20)
 set(CMAKE_CXX_STANDART_REQUIRED ON)
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -lncurses" CACHE STRING "Comment" FORCE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20" CACHE STRING "Comment" FORCE)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -D NDEBUG" CACHE STRING "Comment" FORCE)
 set(CMAKE_CXX_FLAGS_SANITIZER "${CMAKE_CXX_FLAGS} -Wpedantic -Wall -Wextra -Wformat=2 -fsanitize=address,undefined -g" CACHE STRING "Comment" FORCE)
 set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS} -D NDEBUG -fprofile-instr-generate -fcoverage-mapping" CACHE STRING "Comment" FORCE)
@@ -28,6 +28,7 @@ if(NOT googletest_POPULATED)
   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 endif()
 
+include_directories(./include)
 
 set_target_properties(gtest PROPERTIES FOLDER extern)
 set_target_properties(gtest_main PROPERTIES FOLDER extern)
@@ -36,18 +37,20 @@ set_target_properties(gmock_main PROPERTIES FOLDER extern)
 
 enable_testing()
 
-add_executable(onegin onegin.cpp onegin.h)
-#add_executable(test-onegin test-onegin.cpp onegin.h)
+add_executable(gsort src/onegin.cpp)
+add_executable(test-gqsort src/test-gqsort.cpp)
+add_executable(test-comp src/test-comp.cpp)
 
 target_link_libraries(
-    #    test-onegin   
+    test-gqsort
+    test-comp
     gtest_main
 )
 
 include(GoogleTest)
-# gtest_discover_tests(test-onegin)
+gtest_discover_tests(test-gqsort)
+gtest_discover_tests(test-comp)
  
-                            #TODO add cilider for it to look like Pushkin
 
 message("                                                                                ,,,,,,,,,                                                                                            ")
 message("                                                                  .a#      KKKKKKKKKKKK            KKNN##mmw,,,                                                                      ")
