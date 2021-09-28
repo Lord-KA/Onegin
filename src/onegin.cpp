@@ -6,10 +6,12 @@ int main(int argc, char *argv[])
     char fileName[MAX_FILENAME_SIZE + 1];
 
     int option = 0; 
-    while ((option = getopt(argc, argv, "f:lrxh")) != -1) {             //TODO 
+    while ((option = getopt(argc, argv, "f:h")) != -1) {             //TODO 
         switch(option) {
+
             case 'h':
                 printf("sort [-h; -f fileName]\n");
+                exit(0);
                 break;
 
             case 'f':
@@ -31,8 +33,6 @@ int main(int argc, char *argv[])
 
     Text text;
     Text_ctor(&text, fileName);
-
-    Text_dumpIndex(&text);
 
 
     gqsort(text.Index, text.indexLen, sizeof(String), straightComp);

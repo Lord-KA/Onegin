@@ -19,11 +19,14 @@
  */
 void swap(void *one, void *other, size_t size) 
 {
-    void *tmp = calloc(1, size);
-    memcpy(tmp, one, size);
-    memcpy(one, other, size);
-    memcpy(other, tmp, size);   
-    free(tmp);
+    assert(one);
+    assert(other);
+
+    for (size_t i = 0; i < size; ++i) {
+          char  tmp       = ((char*)one)[i];
+        ((char*)one)[i]   = ((char*)other)[i];
+        ((char*)other)[i] = tmp;
+    }
 }
 
 /**

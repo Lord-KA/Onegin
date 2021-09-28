@@ -91,7 +91,7 @@ struct Text {
 static void Text_ctor(Text *this_, char* fileName) {
     FILE *inp = fopen(fileName, "r");
     if (!inp) {
-        printf("Failed to open the file.\n");
+        fprintf(stderr, "Failed to open the file.\n");
         exit(0);
     }
 
@@ -101,7 +101,7 @@ static void Text_ctor(Text *this_, char* fileName) {
 
     #ifndef NDEBUG
     if (this_->data != (char*)POINTER_POISON) {
-        printf("WARNING: Trying to allocate memory for in-use pointer.\n");
+        fprintf(stderr, "WARNING: Trying to allocate memory for in-use pointer.\n");
         assert(false);
     }
     #endif
@@ -110,7 +110,7 @@ static void Text_ctor(Text *this_, char* fileName) {
     this_->dataWrapper = (char*)calloc(this_->dataLen + 2, sizeof(char));         
     
     if (!this_->dataWrapper) { 
-        printf("Failed to allocate buffer memory.\n");
+        fprintf(stderr, "Failed to allocate buffer memory.\n");
         assert(false);
     }
 
@@ -131,24 +131,25 @@ static void Text_ctor(Text *this_, char* fileName) {
     }
 
     if (this_->indexLen == 0) {   
-        printf("File is empty?\n");
-        free(this_->data);
-        this_->data = (char*)POINTER_POISON;
+        fprintf(stderr, "File is empty?\n");
+        free(this_->dataWrapper);
+        this_->data        = (char*)POINTER_POISON;
+        this_->dataWrapper = (char*)POINTER_POISON;
         exit(0);
     }
 
     
     #ifndef NDEBUG
     if (this_->Index != (String*)POINTER_POISON) {
-        printf("WARNING: Trying to allocate memory for in-use pointer.\n");
+        fprintf(stderr, "WARNING: Trying to allocate memory for in-use pointer.\n");
         assert(false);
     }
     #endif
 
     this_->Index = (String*)calloc(this_->indexLen, sizeof(String));
     
-    if (!this_->Index) { //TODO check what calloc returns on failure
-        printf("Failed to allocate buffer memory.\n");
+    if (!this_->Index) { 
+        fprintf(stderr, "Failed to allocate buffer memory.\n");
         assert(false);
     }
 
@@ -166,7 +167,6 @@ static void Text_ctor(Text *this_, char* fileName) {
 
     for (size_t i = 0; i < this_->dataLen - 1 && indexCnt < this_->indexLen - 1; ++i) {
         if (this_->data[i] == '\n') {
-            printf("indexCnt = %zu\n", indexCnt);
             this_->Index[indexCnt].len = dist(this_->Index[indexCnt].beg, &this_->data[i]);
             ++indexCnt;
             this_->Index[indexCnt].beg = &this_->data[i + 1];
@@ -234,7 +234,7 @@ static void Text_dtor(Text *this_)
 {
     #ifndef NDEBUG
     if (this_->data == (char*)POINTER_POISON || this_->Index == (String*)POINTER_POISON) {
-        printf("WARNING: Trying to destroy Text with poisoned pointer.\n");
+        fprintf(stderr, "WARNING: Trying to destroy Text with poisoned pointer.\n");
         assert(false);
     }
     #endif
@@ -276,13 +276,13 @@ int continuoslyCompare(char* firstIter, char* secondIter, int direction)
         else { 
             if (*(secondIter) < *(firstIter)) {
                 #ifdef  VERBOSE_COMP
-                printf("First diff chars: %c < %c\n", *secondIter, *firstIter);
+                fprintf(stderr, "First diff chars: %c < %c\n", *secondIter, *firstIter);
                 #endif
                 return 1;
             }
             if (*(secondIter) > *(firstIter)) { 
                 #ifdef  VERBOSE_COMP
-                printf("First diff chars: %c > %c\n", *secondIter, *firstIter);
+                fprintf(stderr, "First diff chars: %c > %c\n", *secondIter, *firstIter);
                 #endif
                 return -1;
             }
@@ -298,19 +298,19 @@ int continuoslyCompare(char* firstIter, char* secondIter, int direction)
 
     if (*firstIter < *secondIter) {
         #ifdef  VERBOSE_COMP
-        printf("Same letters diff lens: %zu < %zu\n", first->len, second->len);
+        fprintf(stderr, "Same letters diff lens: %zu < %zu\n", first->len, second->len);
         #endif
         return -1;
     }
     else if (*firstIter > *secondIter) {
         #ifdef  VERBOSE_COMP
-        printf("Same letters diff lens: %zu %zu\n", first->len, second->len);
+        fprintf(stderr, "Same letters diff lens: %zu %zu\n", first->len, second->len);
         #endif
         return 1;
     }
     
     #ifdef  VERBOSE_COMP
-    printf("Equal strings\n");
+    fprintf(stderr, "Equal strings\n");
     #endif
 
     return 0;
