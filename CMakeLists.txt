@@ -37,9 +37,9 @@ set_target_properties(gmock_main PROPERTIES FOLDER extern)
 
 enable_testing()
 
-add_executable(gsort src/onegin.cpp)
-add_executable(test-gqsort src/test-gqsort.cpp)
-add_executable(test-comp src/test-comp.cpp)
+add_executable(gsort src/onegin.cpp src/main.cpp src/gqsort.cpp)
+add_executable(test-gqsort src/test-gqsort.cpp src/onegin.cpp src/gqsort.cpp)
+add_executable(test-comp src/test-comp.cpp src/onegin.cpp src/gqsort.cpp)
 
 target_link_libraries(
     test-comp
