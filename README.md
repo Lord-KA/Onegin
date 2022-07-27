@@ -1,5 +1,5 @@
 # Onegin
-Education MIPT task to write a cli program that sorts line in given text different ways
+MIPT task to write a cli program that sorts line in a large text.
 
 ## Building
 ```bash
